@@ -1,108 +1,107 @@
-﻿//using Netpower.CustomerOrders.Application.Common.Interfaces;
-//using Netpower.CustomerOrders.Application.Dtos;
-//using Netpower.CustomerOrders.Application.Dtos.Requests;
-//using System;
-//using System.Collections.Generic;
-//using System.Linq;
-//using System.Text;
-//using System.Threading.Tasks;
+﻿using Netpower.CustomerOrders.Application.Common.Interfaces;
+using Netpower.CustomerOrders.Application.Dtos;
+using Netpower.CustomerOrders.Application.Dtos.Requests;
+using Netpower.CustomerOrders.Domain.Entities;
 
-//namespace Netpower.CustomerOrders.Application.Services
-//{
-//    public sealed class CustomerService : ICustomerService
-//    {
-//        private readonly ICustomerRepository _customerRepository;
+//using Netpower.CustomerOrders.Infrastructure.Persistence.Entities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-//        public CustomerService(ICustomerRepository customerRepository)
-//        {
-//            _customerRepository = customerRepository;
-//        }
+namespace Netpower.CustomerOrders.Application.Services
+{
+    public sealed class CustomerService : ICustomerService
+    {
+        private readonly ICustomerRepository _repo;
 
-//        public async Task<CustomerDto> CreateAsync(CreateCustomerRequest request, CancellationToken ct)
-//        {
-//            // (Optional) business validations can go here (e.g., unique email) later.
+        public CustomerService(ICustomerRepository repo)
+        {
+            _repo = repo;
+        }
 
-//            var customer = new Customers
-//            {
-//                Id = Guid.NewGuid(),
-//                FirstName = request.FirstName.Trim(),
-//                LastName = request.LastName.Trim(),
-//                Email = request.Email.Trim(),
-//                PhoneNumber = request.PhoneNumber?.Trim(),
+        public async Task<CustomerDto> CreateAsync(CreateCustomerRequest request, CancellationToken ct)
+        {
+            var customer = new Customers
+            {
+                Id = Guid.NewGuid(),
+                FirstName = request.FirstName.Trim(),
+                LastName = request.LastName.Trim(),
+                Email = request.Email.Trim(),
+                //PhoneNumber = request.PhoneNumber?.Trim(),
+                IsDeleted = false,
+                DeletedAtUtc = null,
+                CreatedAtUtc = DateTime.UtcNow
+            };
 
-//                // Soft-delete fields (assumed to exist in entity)
-//                IsDeleted = false,
-//                DeletedAtUtc = null
-//            };
+            await _repo.AddAsync(customer, ct);
+            await _repo.SaveChangesAsync(ct);
 
-//            await _customerRepository.AddAsync(customer, ct);
-//            await _customerRepository.SaveChangesAsync(ct);
+            return Map(customer);
+        }
 
-//            return MapToDto(customer);
-//        }
+        public async Task<IReadOnlyList<CustomerDto>> GetAllAsync(CancellationToken ct)
+        {
+            var customers = await _repo.GetAllAsync(ct);
 
-//        public async Task<IReadOnlyList<CustomerDto>> GetAllAsync(CancellationToken ct)
-//        {
-//            var customers = await _customerRepository.GetAllAsync(ct);
+            return customers
+                .Where(x => !x.IsDeleted)
+                .Select(Map)
+                .ToList();
+        }
 
-//            // Usually you do NOT return deleted customers from "GetAll"
-//            return customers
-//                .Where(c => !c.IsDeleted)
-//                .Select(MapToDto)
-//                .ToList();
-//        }
+        public async Task<CustomerDto?> GetByIdAsync(Guid id, CancellationToken ct)
+        {
+            var customer = await _repo.GetByIdAsync(id, ct);
 
-//        public async Task<CustomerDto?> GetByIdAsync(Guid id, CancellationToken ct)
-//        {
-//            var customer = await _customerRepository.GetByIdAsync(id, ct);
+            if (customer is null || customer.IsDeleted)
+                return null;
 
-//            if (customer is null || customer.IsDeleted)
-//                return null;
+            return Map(customer);
+        }
 
-//            return MapToDto(customer);
-//        }
+        public async Task<bool> UpdateAsync(Guid id, UpdateCustomerRequest request, CancellationToken ct)
+        {
+            var customer = await _repo.GetByIdAsync(id, ct);
 
-//        public async Task<bool> UpdateAsync(Guid id, UpdateCustomerRequest request, CancellationToken ct)
-//        {
-//            var customer = await _customerRepository.GetByIdAsync(id, ct);
+            if (customer is null || customer.IsDeleted)
+                return false;
 
-//            if (customer is null || customer.IsDeleted)
-//                return false;
+            customer.FirstName = request.FirstName.Trim();
+            customer.LastName = request.LastName.Trim();
+            customer.Email = request.Email.Trim();
+            //customer.PhoneNumber = request.PhoneNumber?.Trim();
+            customer.UpdatedAtUtc = DateTime.UtcNow;
 
-//            customer.FirstName = request.FirstName.Trim();
-//            customer.LastName = request.LastName.Trim();
-//            customer.Email = request.Email.Trim();
-//            customer.PhoneNumber = request.PhoneNumber?.Trim();
+            await _repo.SaveChangesAsync(ct);
+            return true;
+        }
 
-//            await _customerRepository.SaveChangesAsync(ct);
-//            return true;
-//        }
+        public async Task<bool> SoftDeleteAsync(Guid id, CancellationToken ct)
+        {
+            var customer = await _repo.GetByIdAsync(id, ct);
 
-//        public async Task<bool> SoftDeleteAsync(Guid id, CancellationToken ct)
-//        {
-//            var customer = await _customerRepository.GetByIdAsync(id, ct);
+            if (customer is null || customer.IsDeleted)
+                return false;
 
-//            if (customer is null || customer.IsDeleted)
-//                return false;
+            customer.IsDeleted = true;
+            customer.DeletedAtUtc = DateTime.UtcNow;
+            customer.UpdatedAtUtc = DateTime.UtcNow;
 
-//            customer.IsDeleted = true;
-//            customer.DeletedAtUtc = DateTime.UtcNow;
+            await _repo.SaveChangesAsync(ct);
+            return true;
+        }
 
-//            await _customerRepository.SaveChangesAsync(ct);
-//            return true;
-//        }
+        public Task<bool> ExistsAndActiveAsync(Guid id, CancellationToken ct)
+            => _repo.ExistsAndActiveAsync(id, ct);
 
-//        public Task<bool> ExistsAndActiveAsync(Guid id, CancellationToken ct)
-//            => _customerRepository.ExistsAndActiveAsync(id, ct);
-
-//        private static CustomerDto MapToDto(Customer customer)
-//            => new CustomerDto
-//            {
-//                Id = customer.Id,
-//                FirstName = customer.FirstName,
-//                LastName = customer.LastName,
-//                Email = customer.Email,
-//                PhoneNumber = customer.PhoneNumber
-//            };
-//    }
-//}
+        private static CustomerDto Map(Customers c) => new()
+        {
+            Id = c.Id,
+            FirstName = c.FirstName,
+            LastName = c.LastName,
+            Email = c.Email
+        };
+    }
+}

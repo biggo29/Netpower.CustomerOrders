@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Netpower.CustomerOrders.Infrastructure.Persistence.Entities;
+namespace Netpower.CustomerOrders.Domain.Entities;
 
 public partial class Orders
 {

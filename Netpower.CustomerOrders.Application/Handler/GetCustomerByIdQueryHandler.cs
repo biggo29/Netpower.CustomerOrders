@@ -17,7 +17,21 @@ namespace Netpower.CustomerOrders.Application.Handler
         public GetCustomerByIdQueryHandler(ICustomerRepository customers)
             => _customers = customers;
 
-        public Task<CustomerDto?> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
-            => _customers.GetByIdAsync(request.Id, cancellationToken);
+        public async Task<CustomerDto?> Handle(GetCustomerByIdQuery request, CancellationToken cancellationToken)
+        {
+            var customer = await _customers.GetByIdAsync(request.Id, cancellationToken);
+            if (customer is null)
+            {
+                return null;
+            }
+
+            return new CustomerDto
+            {
+                Id = customer.Id,
+                FirstName = customer.FirstName,
+                LastName = customer.LastName,
+                Email = customer.Email
+            };
+        }
     }
 }

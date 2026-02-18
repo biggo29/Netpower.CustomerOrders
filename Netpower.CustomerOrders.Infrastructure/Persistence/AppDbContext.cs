@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Netpower.CustomerOrders.Application.Common.Interfaces;
-using Netpower.CustomerOrders.Infrastructure.Persistence.Entities;
+using Netpower.CustomerOrders.Domain.Entities;
+
+//using Netpower.CustomerOrders.Infrastructure.Persistence.Entities;
 using System;
 using System.Collections.Generic;
 
