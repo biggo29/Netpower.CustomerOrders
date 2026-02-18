@@ -1,11 +1,20 @@
 using Microsoft.EntityFrameworkCore;
+using Netpower.CustomerOrders.Application.Common.Interfaces;
+using Netpower.CustomerOrders.Application.Query;
 using Netpower.CustomerOrders.Infrastructure.Persistence;
+using Netpower.CustomerOrders.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
+builder.Services.AddScoped<AppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
+builder.Services.AddTransient<ICustomerRepository, CustomerRepository>();
+builder.Services.AddTransient<IOrderRepository, OrderRepository>();
+
+//Add MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetCustomerByIdQuery).Assembly));
 
 // Add services to the container.
 
