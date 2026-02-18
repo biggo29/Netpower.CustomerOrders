@@ -1,4 +1,8 @@
+using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Netpower.CustomerOrders.Api.Middleware;
+using Netpower.CustomerOrders.Application.Common.Behaviors;
 using Netpower.CustomerOrders.Application.Common.Interfaces;
 using Netpower.CustomerOrders.Application.Query;
 using Netpower.CustomerOrders.Infrastructure.Persistence;
@@ -16,6 +20,16 @@ builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 //Add MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetCustomerByIdQuery).Assembly));
 
+// FluentValidation: scan Application assembly for validators
+builder.Services.AddValidatorsFromAssembly(typeof(GetCustomerByIdQuery).Assembly);
+
+// Validation pipeline
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
+
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -31,6 +45,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 
