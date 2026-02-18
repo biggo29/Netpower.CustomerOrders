@@ -10,9 +10,8 @@ using Netpower.CustomerOrders.Infrastructure.Repositories;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Verbose()
     .WriteTo.Console()
-    .CreateBootstrapLogger();
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 

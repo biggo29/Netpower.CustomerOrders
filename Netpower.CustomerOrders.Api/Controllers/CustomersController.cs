@@ -10,8 +10,10 @@ namespace Netpower.CustomerOrders.Api.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<CustomerOrdersController> _logger;
 
-        public CustomersController(IMediator mediator) => _mediator = mediator;
+        public CustomersController(IMediator mediator, ILogger<CustomerOrdersController> logger) 
+            => (_mediator, _logger) = (mediator, logger);
 
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct)
