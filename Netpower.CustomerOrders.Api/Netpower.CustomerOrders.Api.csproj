@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>1111780a-e415-46a4-b504-a33abe31bb06</UserSecretsId>
+	  <PreserveCompilationContext>true</PreserveCompilationContext>
+	  <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
   </PropertyGroup>
 
   <ItemGroup>
