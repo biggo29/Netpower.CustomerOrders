@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Netpower.CustomerOrders.Application.Common.Interfaces;
 using Netpower.CustomerOrders.Application.Dtos;
+using Netpower.CustomerOrders.Domain.Enums;
 using Netpower.CustomerOrders.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace Netpower.CustomerOrders.Infrastructure.Repositories
                 .Select(o => new OrderDto(
                     o.Id,
                     o.OrderNumber,
-                    o.Status,
+                    (OrderStatus)o.Status,
                     o.OrderDateUtc,
                     o.TotalAmount,
                     o.CustomerId

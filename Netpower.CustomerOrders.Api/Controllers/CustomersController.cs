@@ -16,9 +16,18 @@ namespace Netpower.CustomerOrders.Api.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById([FromRoute] Guid id, CancellationToken ct)
         {
+            _logger.LogInformation("Request received: Get customer by id {CustomerId}", id);
+
             var customer = await _mediator.Send(new GetCustomerByIdQuery(id), ct);
 
-            return customer is null ? NotFound() : Ok(customer);
+            if (customer is null)
+            {
+                _logger.LogWarning("Customer not found: {CustomerId}", id);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Customer retrieved: {CustomerId}", id);
+            return Ok(customer);
         }
     }
 }

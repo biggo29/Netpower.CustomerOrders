@@ -7,6 +7,12 @@ using Netpower.CustomerOrders.Application.Common.Interfaces;
 using Netpower.CustomerOrders.Application.Query;
 using Netpower.CustomerOrders.Infrastructure.Persistence;
 using Netpower.CustomerOrders.Infrastructure.Repositories;
+using Serilog;
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Verbose()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,7 +34,8 @@ builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBeh
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
-
+//Add Serilog
+builder.Host.UseSerilog();
 
 // Add services to the container.
 
