@@ -21,9 +21,22 @@ public partial class AppDbContext : DbContext, IAppDbContext
 
     public virtual DbSet<Orders> Orders { get; set; }
 
+    //    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+    //        => optionsBuilder.UseSqlServer("Server=DESKTOP-SHEVKKB\\SQLEXPRESS;Database=Netpower;User Id=sa;Password=SqlServer;TrustServerCertificate=True;Encrypt=False;");
+
+
+    // ✅ Do NOT configure provider here. DI must provide options.
+    // Keeping OnConfiguring only as a safety guard.
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-SHEVKKB\\SQLEXPRESS;Database=Netpower;User Id=sa;Password=SqlServer;TrustServerCertificate=True;Encrypt=False;");
+    {
+        if (!optionsBuilder.IsConfigured)
+        {
+            throw new InvalidOperationException(
+                "AppDbContext is not configured. Register it via DI (AddDbContext) " +
+                "with a connection string from configuration.");
+        }
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
