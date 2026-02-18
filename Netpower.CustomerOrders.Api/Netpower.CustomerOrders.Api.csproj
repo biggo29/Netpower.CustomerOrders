@@ -21,4 +21,9 @@
     <Folder Include="Swagger\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Netpower.CustomerOrders.Infrastructure\Netpower.CustomerOrders.Infrastructure.csproj" />
+    <ProjectReference Include="..\Netpower.CustomerOrders.Application\Netpower.CustomerOrders.Application.csproj" />
+  </ItemGroup>
+
 </Project>

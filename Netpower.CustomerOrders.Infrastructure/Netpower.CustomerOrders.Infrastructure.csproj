@@ -22,4 +22,9 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Netpower.CustomerOrders.Domain\Netpower.CustomerOrders.Domain.csproj" />
+    <ProjectReference Include="..\Netpower.CustomerOrders.Application\Netpower.CustomerOrders.Application.csproj" />
+  </ItemGroup>
+
 </Project>
