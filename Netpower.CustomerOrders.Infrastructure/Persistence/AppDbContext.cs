@@ -1,11 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using Netpower.CustomerOrders.Application.Common.Interfaces;
 using Netpower.CustomerOrders.Infrastructure.Persistence.Entities;
+using System;
+using System.Collections.Generic;
 
 namespace Netpower.CustomerOrders.Infrastructure.Persistence;
 
-public partial class AppDbContext : DbContext
+public partial class AppDbContext : DbContext, IAppDbContext
 {
     public AppDbContext()
     {
