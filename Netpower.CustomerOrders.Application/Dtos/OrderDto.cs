@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Netpower.CustomerOrders.Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace Netpower.CustomerOrders.Application.Dtos
     public sealed record OrderDto(
         Guid Id,
         string OrderNumber,
-        byte Status,
+        OrderStatus Status,
         DateTime OrderDateUtc,
         decimal TotalAmount,
         Guid CustomerId
