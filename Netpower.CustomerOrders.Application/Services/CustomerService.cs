@@ -29,7 +29,8 @@ namespace Netpower.CustomerOrders.Application.Services
                 FirstName = request.FirstName.Trim(),
                 LastName = request.LastName.Trim(),
                 Email = request.Email.Trim(),
-                //PhoneNumber = request.PhoneNumber?.Trim(),
+                Phone = request.PhoneNumber,
+                CustomerNumber = "Cust"+ request.PhoneNumber,
                 IsDeleted = false,
                 DeletedAtUtc = null,
                 CreatedAtUtc = DateTime.UtcNow

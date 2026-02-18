@@ -5,6 +5,7 @@ using Netpower.CustomerOrders.Api.Middleware;
 using Netpower.CustomerOrders.Application.Common.Behaviors;
 using Netpower.CustomerOrders.Application.Common.Interfaces;
 using Netpower.CustomerOrders.Application.Query;
+using Netpower.CustomerOrders.Application.Services;
 using Netpower.CustomerOrders.Infrastructure.Persistence;
 using Netpower.CustomerOrders.Infrastructure.Repositories;
 using Serilog;
@@ -27,6 +28,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<ICustomerService, CustomerService>();
 
 //Add MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(GetCustomerByIdQuery).Assembly));
