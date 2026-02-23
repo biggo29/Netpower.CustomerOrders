@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+
+  # ============================================================
+  # SQL Server
+  # ============================================================
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: netpower_sqlserver
+    environment:
+      SA_PASSWORD: "${SA_PASSWORD:-SqlServer_Docker_2026!}"
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Express"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$SA_PASSWORD\" -Q \"SELECT 1\" -C -No || exit 1",
+        ]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    networks:
+      - netpower_network
+    restart: unless-stopped
+
+  # ============================================================
+  # API
+  # ============================================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILD_CONFIGURATION: Release
+    container_name: netpower_api
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__Default: >-
+        Server=sqlserver,1433;
+        Database=Netpower;
+        User Id=sa;
+        Password=${SA_PASSWORD:-SqlServer_Docker_2026!};
+        TrustServerCertificate=True;
+        Encrypt=False;
+      Jwt__SecretKey: "${JWT_SECRET_KEY:-CHANGE_ME_use_a_32plus_char_secret_key_here!}"
+      Jwt__Issuer: "Netpower.CustomerOrders.Api"
+      Jwt__Audience: "NetpowerClients"
+      Jwt__ExpirationMinutes: "60"
+      Gdpr__DataRetentionDays: "2555"
+      Gdpr__EnableAnonymization: "true"
+    ports:
+      - "8080:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - netpower_network
+    restart: unless-stopped
+
+# ============================================================
+# Volumes & Networks
+# ============================================================
+volumes:
+  sqlserver_data:
+    driver: local
+
+networks:
+  netpower_network:
+    driver: bridge

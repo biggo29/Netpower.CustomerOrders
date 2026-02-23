@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": ".NET Launch API",
+      "type": "coreclr",
+      "request": "launch",
+      "program": "${workspaceFolder}/Netpower.CustomerOrders.Api/bin/Debug/net8.0/Netpower.CustomerOrders.Api.dll",
+      "cwd": "${workspaceFolder}/Netpower.CustomerOrders.Api",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  ]
+}
